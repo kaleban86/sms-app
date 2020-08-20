@@ -635,7 +635,7 @@ public class DaoImpl extends SimpleSmsReader implements Dao {
 
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost:3306/usb_key", "root", "123");
+        return DriverManager.getConnection("jdbc:mysql://localhost:3306/usb_key", "root", "DtcyfJgznmGhbikf007");
 
 
     }
