@@ -5,6 +5,7 @@ import com.app.dao.DaoImpl;
 import com.app.sms.reader.SmsReader;
 import com.app.sms.reader.impl.SimpleSmsReader;
 import com.app.sms.sending.sms.MailSms;
+import com.app.sms.sending.sms.ModemTest;
 import com.app.sms.writer.SmsWriter;
 import com.app.sms.writer.impl.SimpleSmsWriter;
 import com.app.text.Decoder;
@@ -40,12 +41,18 @@ public class Main {
 
 
 
-        //MailSms mailSms = new MailSms();
+        MailSms mailSms = new MailSms();
 
-       // mailSms.run();
-       // ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
-        //service.scheduleAtFixedRate(mailSms,7,7, TimeUnit.HOURS);
+        mailSms.run();
+        ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
+        service.scheduleAtFixedRate(mailSms,7,7, TimeUnit.HOURS);
 
+
+//        ModemTest modemTest = new ModemTest();
+//        modemTest.run();
+//
+//        ScheduledExecutorService test = Executors.newScheduledThreadPool(1);
+//        service.scheduleAtFixedRate(modemTest,15,15, TimeUnit.MINUTES);
 
 
         SmsWorkflow smsWorkflow = new SimpleSmsWorkflow(smsReader, decoder, dao, smsWriter);

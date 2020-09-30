@@ -90,6 +90,17 @@ public class SimpleSmsReader extends ReadSmsAdministrator implements SmsReader {
                 }
 
             }
+            if (line1.equals("From: DANYCOM") ){
+                File file = new File("/var/spool/sms/incoming/" + fileName);
+
+
+                if (file.delete()) {
+
+
+                    System.out.printf("del");
+                }
+
+            }
            
 
             //Rider Phone

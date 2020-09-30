@@ -85,6 +85,9 @@ public class MailSms implements Runnable {
                     int COUNTphonenanmber = rs.getInt(1);
 
 
+                    if (COUNTphonenanmber == 0){
+                        mailSend();
+                    }
                 }
                 rs.next();
 

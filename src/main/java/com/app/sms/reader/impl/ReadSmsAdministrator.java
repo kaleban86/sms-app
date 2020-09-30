@@ -5,7 +5,9 @@ import com.app.dao.DaoImpl;
 import com.app.sms.reader.SmsReader;
 import com.app.sms.sending.sms.TerminalSendSMS;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -324,8 +326,34 @@ public abstract class ReadSmsAdministrator extends TerminalSendSMS implements Sm
                 }
                 if (keyType.equals(mainKey)) {
 
+                    boolean result = false;
+                    try  {
+                        String sql1 = "select idKey from usb_keys where SerialNum = ? ";
+                        PreparedStatement ps1 = c.prepareStatement(sql1);
+                        ps1.setString(1, code);
+                        ResultSet rs1 = ps1.executeQuery();
 
-                    keyA(code, date, Phone);
+                        while (rs1.next()) {
+                            String id = rs1.getString("idKey");
+                            keyA(id, date, Phone);
+                            result = true;
+                        }
+
+                        if(!result){
+                            noKeyBd(Phone);
+                        }
+
+
+
+                    } catch (Exception ex) {
+
+                        throw new RuntimeException(ex);
+
+                    }
+
+
+
+
 
                 }
                 break;
@@ -339,12 +367,13 @@ public abstract class ReadSmsAdministrator extends TerminalSendSMS implements Sm
     public static String keyA(String codeKey, String date, String Phone) {
 
 
+
         try (Connection con = getConnection();
              Statement statement = con.createStatement()) {
-            PreparedStatement ps = con.prepareStatement("select Code from usb_keys where SerialNum = ?");
+            PreparedStatement ps = con.prepareStatement("select Code from usb_keys where idKey = ?");
             ps.setString(1, codeKey);
-            PreparedStatement ps1 = con.prepareStatement("select ActivationCode   from last_key_activation where idKey  = ?");
-            ps1.setString(1, codeKey + "%");
+            PreparedStatement ps1 = con.prepareStatement("select ActivationCode from last_key_activation where idKey = ?");
+            ps1.setString(1, codeKey);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 byte[] Code = rs.getBytes("Code");
@@ -365,9 +394,12 @@ public abstract class ReadSmsAdministrator extends TerminalSendSMS implements Sm
                     String str = String.valueOf(charArray);
 
 
-                    idKey(str, b, date, Phone, codeKey);
-                    break;
 
+
+
+
+
+                    activationA(str, b, Phone, date, codeKey);
                 }
 
 
@@ -383,36 +415,13 @@ public abstract class ReadSmsAdministrator extends TerminalSendSMS implements Sm
     }
 
 
-    public static boolean idKey(String serialNumber, String keyName, String Phone, String DateActivati, String codeKey) {
-        try (Connection c = getConnection()) {
-            String sql = "select  idKey from last_key_activation where ActivationCode like  ? ";
-            PreparedStatement ps = c.prepareStatement(sql);
-            ps.setString(1, codeKey + "%");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                String idKey = rs.getString(1);
 
 
-                activationA(serialNumber, keyName, Phone, DateActivati, idKey);
 
-
-            }
-
-
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-
-        }
-
-
-        return false;
-    }
-
-
-    public static void activationA(String serialNumber, String keyName, String Date, String Phone, String idKey) throws IOException, InterruptedException {
+    public static void activationA(String serialNumber, String keyName,  String phone,String date, String idKey) throws IOException, InterruptedException {
         LocalDate futureDate = LocalDate.now().plusMonths(12);
-
-        ProcessBuilder builder = new ProcessBuilder("/home/nikolai/Документы/tdes_ecb.exe", keyName, serialNumber, Date);
+        String formattedDate = futureDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        ProcessBuilder builder = new ProcessBuilder("/home/nikolai/Документы/tdes_ecb.exe", keyName, serialNumber, date);
         // задаем переменную окружения руками
         builder.environment().put("COWPATH", "/home/nikolai/Документы/tdes_ecb.exe");
         // указываем перенаправление stderr в stdout, чтобы проще было отлаживать
@@ -424,7 +433,7 @@ public abstract class ReadSmsAdministrator extends TerminalSendSMS implements Sm
             while ((line = br.readLine()) != null) {
 
 
-                idPhoneDBA(Phone, line, idKey, Date);
+                idPhoneDBA(phone, line, idKey, date);
             }
 
 

@@ -496,7 +496,7 @@ public class DaoImpl extends SimpleSmsReader implements Dao {
             PreparedStatement ps = con.prepareStatement("select Code from usb_keys where idKey = ?");
             ps.setString(1, codeKey);
             PreparedStatement ps1 = con.prepareStatement("select ActivationCode from last_key_activation where idKey = ?");
-            ps1.setString(1, idKey);
+            ps1.setString(1, codeKey);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 byte[] Code = rs.getBytes("Code");
@@ -635,7 +635,7 @@ public class DaoImpl extends SimpleSmsReader implements Dao {
 
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost:3306/usb_key", "root", "DtcyfJgznmGhbikf007");
+        return DriverManager.getConnection("jdbc:mysql://localhost:3306/usb_key", "root", "123");
 
 
     }

@@ -16,6 +16,7 @@ public class DaoImplTest extends DaoImpl {
         res = dao.smsSearchKeyBdClient("0012", "79827956841");
         assertTrue(res);
 
+
     }
 
     @Test
